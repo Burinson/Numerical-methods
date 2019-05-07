@@ -118,6 +118,25 @@ def F_Regla_Falsa():
     reglaFalsa(f, xI, xD)
     input("Presione enter para salir: ")
 
+#Punto fijo
+def F_Punto_Fijo():
+
+    expr = input("g(x) = ")
+    x0 = float(input("x0 = "))
+    def g(x):
+        return eval(expr)
+
+    def puntoFijo(g, x0):
+        xsig = g(x0)
+        while(abs(xsig - x0) != 0):
+            x0 = xsig
+            xsig = g(x0)
+        print("Raíz de x: ", xsig)
+
+    puntoFijo(g, x0)
+
+    input("Presione enter para salir: ")
+
 #Menú
 def menu():
     while(True):
@@ -126,6 +145,7 @@ def menu():
         print("2) Newton-Raphson")
         print("3) Secante")
         print("4) Regla falsa")
+        print("5) Punto fijo")
         print("0) Salir")
         op = input("Opción: ")
         if op == "1":
@@ -136,6 +156,8 @@ def menu():
             F_Secante()
         elif op == "4":
             F_Regla_Falsa()
+        elif op == "5":
+            F_Punto_Fijo()
         elif op == "0":
             print("El programa ha sido cerrado")
             break
