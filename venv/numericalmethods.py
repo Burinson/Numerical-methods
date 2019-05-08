@@ -1,6 +1,7 @@
 #Limpiar pantalla
 from os import system, name
 from math import *
+import numpy
 
 def clear():
     # Windows
@@ -178,11 +179,7 @@ def F_Crout():
     for part in lu(a):
         pprint(part, width=19)
         print()
-    print()
-    b = [[11, 9, 24, 2], [1, 5, 2, 6], [3, 17, 18, 1], [2, 5, 7, 1]]
-    for part in lu(b):
-        pprint(part)
-        print()
+
     input("Presione enter para salir: ")
 
 
@@ -198,42 +195,29 @@ def F_Choleski():
                 s = sum(L[i][k] * L[j][k] for k in range(j))
                 L[i][j] = sqrt(A[i][i] - s) if (i == j) else \
                     (1.0 / L[j][j] * (A[i][j] - s))
-        return L
 
-    m1 = [[25, 15, -5],
-          [15, 18, 0],
-          [-5, 0, 11]]
+        X = numpy.dot(numpy.dot(numpy.linalg.inv(numpy.transpose(L)), numpy.linalg.inv(L)), b)
+        return X
 
-    # A basic code for matrix input from user
 
-    R = int(input("Enter the number of rows:"))
-    C = int(input("Enter the number of columns:"))
 
-    # Initialize matrix
+    nn = int(input("Tamaño de filas y columas de la matriz cuadrada: "))
+
     matrix = []
-    print("Enter the entries rowwise:")
+    b = []
+    print("Introduce datos para matriz A por línea: ")
 
-    # For user input
-    for i in range(R):  # A for loop for row entries
+    for i in range(nn):
         a = []
-        for j in range(C):  # A for loop for column entries
-            a.append(int(input()))
+        for j in range(nn):
+            a.append(float(input()))
         matrix.append(a)
 
-        # For printing the matrix
-    for i in range(R):
-        for j in range(C):
-            print(matrix[i][j], end=" ")
-        print()
+    print("Introduce datos para el vector B uno por línea: ")
+    for i in range(nn):
+        b.append(float(input()))
 
-    pprint(cholesky(m1))
-    print()
-
-    m2 = [[18, 22, 54, 42],
-          [22, 70, 86, 62],
-          [54, 86, 174, 134],
-          [42, 62, 134, 106]]
-    pprint(cholesky(m2), width=120)
+    pprint(cholesky(matrix))
 
     input("Presione enter para salir: ")
 
