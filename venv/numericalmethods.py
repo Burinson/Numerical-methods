@@ -2,6 +2,8 @@
 from os import system, name
 from math import *
 import numpy
+from pprint import pprint
+from matplotlib import pyplot as plt
 
 def clear():
     # Windows
@@ -35,8 +37,8 @@ def F_Biseccion():
         return eval(expr)
 
     expr = input("f(x) = ");
-    a = float(input("Punto bajo:"))
-    b = float(input("Punto alto:"))
+    a = float(input("Punto bajo: "))
+    b = float(input("Punto alto: "))
 
     x = biseccion(f, a, b)
     print("Punto medio:", x)
@@ -185,8 +187,6 @@ def F_Crout():
 
 #Choleski
 def F_Choleski():
-    from pprint import pprint
-    from math import sqrt
 
     def cholesky(A):
         L = [[0.0] * len(A) for _ in range(len(A))]
@@ -221,6 +221,85 @@ def F_Choleski():
 
     input("Presione enter para salir: ")
 
+#Método de Euler
+def F_Euler():
+    expr = input("f'(x,y) = ")
+    forTitle = expr
+    x0 = float(input("x0: "))
+    y0 = float(input("y0: "))
+    xf = int(input("Intervalo de x: "))
+    n = int(input("Número de puntos: "))
+    n = n+1
+    deltax = (xf - x0) / (n-1)
+
+    x = numpy.linspace(x0, xf, n)
+
+    y = numpy.zeros([n])
+    y[0] = y0
+    expr = expr.replace("y", "y[i-1]")
+    expr = expr.replace("x", "x[i-1]")
+    for i in range(1, n):
+        print(expr)
+        y[i] = y[i-1] + deltax * eval(expr)
+
+    for i in range(n):
+        print(x[i], y[i])
+
+    plt.plot(x, y, 'o')
+    plt.xlabel("Valor de x")
+    plt.ylabel("Valor de y")
+    plt.title(forTitle)
+    plt.show()
+    input("Presione enter para salir: ")
+
+#Método de Euler mejorado
+def F_Euler_Mejorado():
+    expr = input("f'(x,y) = ")
+    forTitle = expr
+    x0 = float(input("x0: "))
+    y0 = float(input("y0: "))
+    xf = int(input("Intervalo de x: "))
+    n = int(input("Número de puntos: "))
+    n = n+1
+    deltax = (xf - x0) / (n-1)
+
+    x = numpy.linspace(x0, xf, n)
+    xM = numpy.linspace(x0, xf, n)
+
+    y = numpy.zeros([n])
+    yM = numpy.zeros([n])
+
+    y[0] = y0
+    yM[0] = y0
+
+    expr = expr.replace("y", "y[i-1]")
+    expr = expr.replace("x", "x[i-1]")
+    for i in range(1, n):
+        print(expr)
+        y[i] = deltax * eval(expr)
+        exprM = forTitle
+        exprM2 = forTitle
+
+        exprM = exprM.replace("x", "xM[i-1]")
+        exprM = exprM.replace("y", "yM[i-1]")
+
+        exprM2 = exprM2.replace("x", "xM[i]")
+        exprM2 = exprM2.replace("y", "y[i]")
+        print(exprM, exprM2)
+        y[i] = y[i - 1] + deltax * eval(expr)
+        yM[i] = yM[i-1] + (deltax / 2) * (eval(exprM) + eval(exprM2))
+
+    for i in range(n):
+        print(xM[i], yM[i])
+
+    plt.plot(xM, yM, 'o')
+    plt.xlabel("Valor de x")
+    plt.ylabel("Valor de y")
+    plt.title(forTitle)
+    plt.show()
+    input("Presione enter para salir: ")
+
+
 #Menú
 def menu():
     while(True):
@@ -232,6 +311,8 @@ def menu():
         print("5) Punto fijo")
         print("6) Crout")
         print("7) Choleski")
+        print("8) Euler")
+        print("9) Euler mejorado")
         print("0) Salir")
         op = input("Opción: ")
         if op == "1":
@@ -248,6 +329,10 @@ def menu():
             F_Crout()
         elif op == "7":
             F_Choleski()
+        elif op == "8":
+            F_Euler()
+        elif op == "9":
+            F_Euler_Mejorado()
         elif op == "0":
             print("El programa ha sido cerrado")
             break
