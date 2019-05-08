@@ -1,6 +1,7 @@
 #Limpiar pantalla
 from os import system, name
 from math import *
+
 def clear():
     # Windows
     if name == 'nt':
@@ -58,6 +59,7 @@ def F_Newton_Raphson():
         print("Raíz de x:", xsig)
 
     def f(x):
+
         return eval(expr)
 
     def df(x):
@@ -137,6 +139,104 @@ def F_Punto_Fijo():
 
     input("Presione enter para salir: ")
 
+#Crout
+def F_Crout():
+    from pprint import pprint
+
+    def matrixMul(A, B):
+        TB = list(zip(*B))
+        return [[sum(ea * eb for ea, eb in zip(a, b)) for b in TB] for a in A]
+
+    def pivotize(m):
+        """Creates the pivoting matrix for m."""
+        n = len(m)
+        ID = [[float(i == j) for i in range(n)] for j in range(n)]
+        for j in range(n):
+            row = max(range(j, n), key=lambda i: abs(m[i][j]))
+            if j != row:
+                ID[j], ID[row] = ID[row], ID[j]
+        return ID
+
+    def lu(A):
+        """Decomposes a nxn matrix A by PA=LU and returns L, U and P."""
+        n = len(A)
+        L = [[0.0] * n for i in range(n)]
+        U = [[0.0] * n for i in range(n)]
+        P = pivotize(A)
+        A2 = matrixMul(P, A)
+        for j in range(n):
+            L[j][j] = 1.0
+            for i in range(j + 1):
+                s1 = sum(U[k][j] * L[i][k] for k in range(i))
+                U[i][j] = A2[i][j] - s1
+            for i in range(j, n):
+                s2 = sum(U[k][j] * L[i][k] for k in range(j))
+                L[i][j] = (A2[i][j] - s2) / U[j][j]
+        return (L, U, P)
+
+    a = [[1, 3, 5], [2, 4, 7], [1, 1, 0]]
+    for part in lu(a):
+        pprint(part, width=19)
+        print()
+    print()
+    b = [[11, 9, 24, 2], [1, 5, 2, 6], [3, 17, 18, 1], [2, 5, 7, 1]]
+    for part in lu(b):
+        pprint(part)
+        print()
+    input("Presione enter para salir: ")
+
+
+#Choleski
+def F_Choleski():
+    from pprint import pprint
+    from math import sqrt
+
+    def cholesky(A):
+        L = [[0.0] * len(A) for _ in range(len(A))]
+        for i in range(len(A)):
+            for j in range(i + 1):
+                s = sum(L[i][k] * L[j][k] for k in range(j))
+                L[i][j] = sqrt(A[i][i] - s) if (i == j) else \
+                    (1.0 / L[j][j] * (A[i][j] - s))
+        return L
+
+    m1 = [[25, 15, -5],
+          [15, 18, 0],
+          [-5, 0, 11]]
+
+    # A basic code for matrix input from user
+
+    R = int(input("Enter the number of rows:"))
+    C = int(input("Enter the number of columns:"))
+
+    # Initialize matrix
+    matrix = []
+    print("Enter the entries rowwise:")
+
+    # For user input
+    for i in range(R):  # A for loop for row entries
+        a = []
+        for j in range(C):  # A for loop for column entries
+            a.append(int(input()))
+        matrix.append(a)
+
+        # For printing the matrix
+    for i in range(R):
+        for j in range(C):
+            print(matrix[i][j], end=" ")
+        print()
+
+    pprint(cholesky(m1))
+    print()
+
+    m2 = [[18, 22, 54, 42],
+          [22, 70, 86, 62],
+          [54, 86, 174, 134],
+          [42, 62, 134, 106]]
+    pprint(cholesky(m2), width=120)
+
+    input("Presione enter para salir: ")
+
 #Menú
 def menu():
     while(True):
@@ -146,6 +246,8 @@ def menu():
         print("3) Secante")
         print("4) Regla falsa")
         print("5) Punto fijo")
+        print("6) Crout")
+        print("7) Choleski")
         print("0) Salir")
         op = input("Opción: ")
         if op == "1":
@@ -158,6 +260,10 @@ def menu():
             F_Regla_Falsa()
         elif op == "5":
             F_Punto_Fijo()
+        elif op == "6":
+            F_Crout()
+        elif op == "7":
+            F_Choleski()
         elif op == "0":
             print("El programa ha sido cerrado")
             break
