@@ -4,6 +4,7 @@ from math import *
 import numpy
 from pprint import pprint
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def clear():
     # Windows
@@ -144,14 +145,12 @@ def F_Punto_Fijo():
 
 #Crout
 def F_Crout():
-    from pprint import pprint
 
     def matrixMul(A, B):
         TB = list(zip(*B))
         return [[sum(ea * eb for ea, eb in zip(a, b)) for b in TB] for a in A]
 
     def pivotize(m):
-        """Creates the pivoting matrix for m."""
         n = len(m)
         ID = [[float(i == j) for i in range(n)] for j in range(n)]
         for j in range(n):
@@ -161,7 +160,6 @@ def F_Crout():
         return ID
 
     def lu(A):
-        """Decomposes a nxn matrix A by PA=LU and returns L, U and P."""
         n = len(A)
         L = [[0.0] * n for i in range(n)]
         U = [[0.0] * n for i in range(n)]
@@ -299,6 +297,159 @@ def F_Euler_Mejorado():
     plt.show()
     input("Presione enter para salir: ")
 
+#Mínimos cuadrados lineal
+def F_Minimos_Cuadrados_Lineal():
+    n = int(input("Número de datos: "))
+
+    xi = []
+    yi = []
+
+    print("Datos para el vector x: ")
+    for i in range(n):
+        xi.append(float(input()))
+
+    print("Datos para el vector y: ")
+    for i in range(n):
+        yi.append(float(input()))
+
+    xbias = float(input("Dato de x para predecir y: "))
+
+
+    sumx = sum(xi)
+    sumy = sum(yi)
+
+    xpory = []
+    for i in range(n):
+        xpory.append(xi[i] * yi[i])
+
+    sumxpory = sum(xpory)
+
+    xcuadrada = []
+    for i in range(n):
+        xcuadrada.append(xi[i] ** 2)
+
+    sumxcuadrada = sum(xcuadrada)
+
+    a = [[0, 0], [0, 0]]
+    a[0][0] = n
+    a[0][1] = sumx
+    a[1][0] = sumx
+    a[1][1] = sumxcuadrada
+
+    b = []
+    b.append(sumy)
+    b.append(sumxpory)
+
+    ainv = numpy.linalg.inv(a)
+
+    x = []
+    x = numpy.dot(ainv, b)
+
+    sol = x[0] + x[1] * xbias
+
+    print("Solución: ", sol)
+
+    xi.append(xbias)
+    yi.append(sol)
+
+    plt.plot(xi, yi, 'o')
+    plt.xlabel("Valor de x")
+    plt.ylabel("Valor de y")
+    plt.title("Mínimos cuadrados (lineal)")
+    plt.show()
+
+    input("Presione enter para salir: ")
+
+#Mínimos cuadrados multilineal
+def F_Minimos_Cuadrados_Multilineal():
+    fig = plt.figure()
+    ax = Axes3D(fig)
+
+    n = int(input("Número de datos: "))
+
+    yi = []
+    ui = []
+    vi = []
+
+    print("Datos para el vector y: ")
+    for i in range(n):
+        yi.append(float(input()))
+
+    print("Datos para el vector u: ")
+    for i in range(n):
+        ui.append(float(input()))
+
+    print("Datos para el vector v: ")
+    for i in range(n):
+        vi.append(float(input()))
+
+    ubias = float(input("Dato de u para predecir y: "))
+    vbias = float(input("Dato de v para predecir y: "))
+
+    sumy = sum(yi)
+    sumu = sum(ui)
+    sumv = sum(vi)
+
+    uporv = []
+    for i in range(n):
+        uporv.append(ui[i] * vi[i])
+
+    sumuporv = sum(uporv)
+
+    vpory = []
+    for i in range(n):
+        vpory.append(vi[i] * yi[i])
+
+    sumvpory = sum(vpory)
+
+    ucuadrada = []
+    for i in range(n):
+        ucuadrada.append(ui[i] ** 2)
+
+    vcuadrada = []
+    for i in range(n):
+        vcuadrada.append(vi[i] ** 2)
+
+    sumucuadrada = sum(ucuadrada)
+    sumvcuadrada = sum(vcuadrada)
+
+    a = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    a[0][0] = n
+    a[0][1] = sumu
+    a[0][2] = sumv
+    a[1][0] = sumu
+    a[1][1] = sumucuadrada
+    a[1][2] = sumuporv
+    a[2][0] = sumv
+    a[2][1] = sumuporv
+    a[2][2] = sumvcuadrada
+
+    b = []
+    b.append(sumy)
+    b.append(sumuporv)
+    b.append(sumvpory)
+
+    ainv = numpy.linalg.inv(a)
+
+    x = []
+    x = numpy.dot(ainv, b)
+
+    sol = x[0] + x[1] * ubias + x[2] * vbias
+
+    print("Solución: ", sol)
+
+    ui.append(ubias)
+    yi.append(sol)
+    vi.append(vbias)
+
+    ax.scatter(ui, vi, yi)
+    ax.set_xlabel('$u$')
+    ax.set_ylabel('$v$')
+    ax.set_zlabel('$y$')
+    plt.title("Mínimos cuadrados multilineal")
+    plt.show()
+
+    input("Presione enter para salir: ")
 
 #Menú
 def menu():
@@ -313,6 +464,8 @@ def menu():
         print("7) Choleski")
         print("8) Euler")
         print("9) Euler mejorado")
+        print("10) Mínimos cuadrados (lineal)")
+        print("11) Mínimos cuadrados (multilineal)")
         print("0) Salir")
         op = input("Opción: ")
         if op == "1":
@@ -333,6 +486,10 @@ def menu():
             F_Euler()
         elif op == "9":
             F_Euler_Mejorado()
+        elif op == "10":
+            F_Minimos_Cuadrados_Lineal()
+        elif op == "11":
+            F_Minimos_Cuadrados_Multilineal()
         elif op == "0":
             print("El programa ha sido cerrado")
             break
