@@ -5,6 +5,8 @@ import numpy
 from pprint import pprint
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from functools import *
+from operator import *
 
 def clear():
     # Windows
@@ -194,7 +196,7 @@ def F_Choleski():
                 L[i][j] = sqrt(A[i][i] - s) if (i == j) else \
                     (1.0 / L[j][j] * (A[i][j] - s))
 
-        X = numpy.dot(numpy.dot(numpy.linalg.inv(numpy.transpose(L)), numpy.linalg.inv(L)), b)
+        X = numpy.dot(numpy.dot(numpy.linalg.pinv(numpy.transpose(L)), numpy.linalg.pinv(L)), b)
         return X
 
 
@@ -340,7 +342,7 @@ def F_Minimos_Cuadrados_Lineal():
     b.append(sumy)
     b.append(sumxpory)
 
-    ainv = numpy.linalg.inv(a)
+    ainv = numpy.linalg.pinv(a)
 
     x = []
     x = numpy.dot(ainv, b)
@@ -351,6 +353,7 @@ def F_Minimos_Cuadrados_Lineal():
 
     xi.append(xbias)
     yi.append(sol)
+
 
     plt.plot(xi, yi, 'o')
     plt.xlabel("Valor de x")
@@ -402,6 +405,12 @@ def F_Minimos_Cuadrados_Multilineal():
 
     sumvpory = sum(vpory)
 
+    upory = []
+    for i in range(n):
+        upory.append(ui[i] * yi[i])
+
+    sumupory = sum(upory)
+
     ucuadrada = []
     for i in range(n):
         ucuadrada.append(ui[i] ** 2)
@@ -426,10 +435,10 @@ def F_Minimos_Cuadrados_Multilineal():
 
     b = []
     b.append(sumy)
-    b.append(sumuporv)
+    b.append(sumupory)
     b.append(sumvpory)
 
-    ainv = numpy.linalg.inv(a)
+    ainv = numpy.linalg.pinv(a)
 
     x = []
     x = numpy.dot(ainv, b)
@@ -451,6 +460,48 @@ def F_Minimos_Cuadrados_Multilineal():
 
     input("Presione enter para salir: ")
 
+#Lagrange
+def F_Lagrange():
+    n = int(input("Número de datos: "))
+
+    xi = []
+    yi = []
+
+    print("Datos para el vector x: ")
+    for i in range(n):
+        xi.append(float(input()))
+
+    print("Datos para el vector y: ")
+    for i in range(n):
+        yi.append(float(input()))
+
+    x = float(input("Valor de x: "))
+
+    def lagrange(x, x_values, y_values):
+        def _basis(j):
+            p = [(x - x_values[m]) / (x_values[j] - x_values[m]) for m in range(k) if m != j]
+            return reduce(mul, p)
+
+        assert len(x_values) != 0 and (
+                len(x_values) == len(y_values)), 'x y y no pueden estar vacíos y deben tener la misma longitud'
+        k = len(x_values)
+        sol = sum(_basis(j) * y_values[j] for j in range(k))
+        print("Solución: ", sol)
+        xi.append(x)
+        yi.append(sol)
+
+    lagrange(x, xi, yi)
+
+    xi = sorted(xi)
+    yi = sorted(yi)
+
+    plt.plot(xi, yi, 'go-')
+    plt.xlabel("Valor de x")
+    plt.ylabel("Valor de y")
+    plt.title("Interpolación con el método de Lagrange")
+    plt.show()
+
+    input("Presione enter para salir: ")
 #Menú
 def menu():
     while(True):
@@ -466,6 +517,7 @@ def menu():
         print("9) Euler mejorado")
         print("10) Mínimos cuadrados (lineal)")
         print("11) Mínimos cuadrados (multilineal)")
+        print("12) Lagrange")
         print("0) Salir")
         op = input("Opción: ")
         if op == "1":
@@ -490,6 +542,8 @@ def menu():
             F_Minimos_Cuadrados_Lineal()
         elif op == "11":
             F_Minimos_Cuadrados_Multilineal()
+        elif op == "12":
+            F_Lagrange()
         elif op == "0":
             print("El programa ha sido cerrado")
             break
